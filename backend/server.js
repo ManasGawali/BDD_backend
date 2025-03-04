@@ -25,7 +25,7 @@ app.use(express.json());
 
 // Set up CORS (Cross-Origin Resource Sharing)
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:5000'], // Allow both frontend and API URLs
+    origin: ['http://localhost:3000', 'http://localhost:5000', 'https://www.pictoreal.in'], // Allow both frontend and API URLs
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization']
