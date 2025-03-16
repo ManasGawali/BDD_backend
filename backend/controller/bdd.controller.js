@@ -264,6 +264,36 @@ export const approveDonors = async (req, res) => {
     }
 };
 
+export const deleteUnapprovedDonors = async (req, res) => {
+    try {
+        const { donorRegno } = req.body;
+        if (!donorRegno || !Array.isArray(donorRegno) || donorRegno.length === 0) {
+            return res.status(400).json({ error: "Valid donor registration numbers are required" });
+        }
+
+        let stats = await BDD.findOne();
+        if (!stats) return res.status(404).json({ error: "No donor data found" });
+
+        let deletedCount = 0;
+        stats.recentDonors = stats.recentDonors.filter(donor => {
+            if (donorRegno.includes(donor.reg_number) && donor.approved === false) {
+                deletedCount++;
+                return false; // Exclude from the updated array (deleting)
+            }
+            return true; // Keep other donors
+        });
+
+        if (deletedCount === 0) return res.status(404).json({ error: "No unapproved donors found to delete" });
+
+        await stats.save();
+        res.status(200).json({ message: `Deleted ${deletedCount} unapproved donors successfully` });
+    } catch (error) {
+        console.error("Error in deleteUnapprovedDonors:", error);
+        res.status(500).json({ error: "Server error" });
+    }
+};
+
+
 export const generateCertificate = async (req, res) => {
     try {
         const { reg_number } = req.params;
