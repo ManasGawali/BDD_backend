@@ -1,4 +1,5 @@
 import express from 'express';
+import jwt from "jsonwebtoken";
 import { newDonor } from '../controller/bdd.controller.js';
 import { getDonors } from '../controller/bdd.controller.js';
 import { getNewDonors } from '../controller/bdd.controller.js';
@@ -27,15 +28,46 @@ router.get("/certificate/:reg_number", generateCertificate);
 
 router.get("/certificate", getCertifiedDonors);
 
+// router.post("/login", (req, res, next) => {
+//     passport.authenticate('local', (err, user, info) => {
+//         if (err) {
+//             return res.status(500).json({ 
+//                 success: false, 
+//                 message: "Internal server error" 
+//             });
+//         }
+        
+//         if (!user) {
+//             return res.status(401).json({ 
+//                 success: false, 
+//                 message: info.message || "Invalid credentials" 
+//             });
+//         }
+
+//         req.logIn(user, (err) => {
+//             if (err) {
+//                 return res.status(500).json({ 
+//                     success: false, 
+//                     message: "Failed to establish session" 
+//                 });
+//             }
+            
+//             return Login(req, res);
+//         });
+//     })(req, res, next);
+// });
+
+const JWT_SECRET = process.env.JWT_SECRET;
+
 router.post("/login", (req, res, next) => {
-    passport.authenticate('local', (err, user, info) => {
+    passport.authenticate('local', async (err, user, info) => {
         if (err) {
             return res.status(500).json({ 
                 success: false, 
                 message: "Internal server error" 
             });
         }
-        
+
         if (!user) {
             return res.status(401).json({ 
                 success: false, 
@@ -43,15 +75,21 @@ router.post("/login", (req, res, next) => {
             });
         }
 
-        req.logIn(user, (err) => {
-            if (err) {
-                return res.status(500).json({ 
-                    success: false, 
-                    message: "Failed to establish session" 
-                });
+        // Create JWT token
+        const token = jwt.sign(
+            { id: user._id, username: user.username },
+            JWT_SECRET,
+            { expiresIn: "1h" }
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "Login successful",
+            token,
+            user: {
+                id: user._id,
+                username: user.username
             }
-            
-            return Login(req, res);
         });
     })(req, res, next);
 });
