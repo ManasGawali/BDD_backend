@@ -1,5 +1,6 @@
 import express from 'express';
 import jwt from "jsonwebtoken";
+import dotenv from 'dotenv';
 import { newDonor } from '../controller/bdd.controller.js';
 import { getDonors } from '../controller/bdd.controller.js';
 import { getNewDonors } from '../controller/bdd.controller.js';
@@ -11,6 +12,8 @@ import { Login,logout } from '../controller/bdd.controller.js';
 import User from '../models/user.model.js';
 
 import passport from "passport";
+
+dotenv.config();
 
 const router = express.Router();
 
